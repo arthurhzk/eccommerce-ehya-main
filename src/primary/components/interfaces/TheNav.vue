@@ -3,7 +3,7 @@
     <SideContainer>
       <nav>
         <div class="max-w-screen-xl flex flex-wrap items-center justify-between mx-auto p-4">
-          <router-link :to="RouteNameEnum.HOME">
+          <router-link :to="{ name: RouteNameEnum.HOME }">
             <img src="/Logo.svg" class="h-8" />
           </router-link>
 

@@ -96,7 +96,8 @@ const callApi = async () => {
 }
 
 let state = ''
-const cities = ref([])
+
+const cities = ref<City[] | null>(null)
 const handleStateChange = (value: any) => {
   callApi()
 }
@@ -104,14 +105,22 @@ const handleStateChange = (value: any) => {
 onMounted(() => {
   callApi()
 })
+interface City {
+  nome: string
+  id: number
+}
 
 const alphabeticalCityOrder = computed(() => {
+  if (cities.value === null) {
+    return []
+  }
+
   // eslint-disable-next-line vue/no-side-effects-in-computed-properties
   return cities.value.sort((a: any, b: any) => {
-    if (a.nome < b.nome) {
+    if (a.nome > b.nome) {
       return -1
     }
-    if (a.nome > b.nome) {
+    if (a.nome < b.nome) {
       return 1
     }
     return 0
