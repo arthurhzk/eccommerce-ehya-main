@@ -99,7 +99,7 @@ import { ref, watch } from 'vue'
 import SideContainer from '@/primary/components/container/SideContainer.vue'
 import { RouteNameEnum } from '@/domain/enums/RouteEnum'
 import { useRoute } from 'vue-router'
-import type router from '@/primary/infrastructure/router'
+
 const isOpen = ref(false)
 const route = useRoute()
 const toggleBurguer = () => {

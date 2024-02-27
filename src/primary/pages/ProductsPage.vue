@@ -14,6 +14,7 @@
           <Label>Lista de Produtos</Label>
           <Input v-model="search" placeholder="Pesquise o seu produto..." />
         </div>
+
         <div class="mt-4 md:mt-10 md:mr-20">
           <Select v-model="filter" @change="filteredProducts">
             <SelectTrigger>
@@ -31,6 +32,9 @@
       </div>
 
       <div class="flex items-center justify-center flex-wrap gap-4">
+        <h2 class="text-semibold" v-if="filteredProducts.length === 0">
+          Nenhum produto encontrado!
+        </h2>
         <div v-for="product in filteredProducts" :key="product.product">
           <Transition>
             <ProductCard @add="addToCart(product)" :product="product" />
@@ -82,6 +86,7 @@ const searchProducts = computed(() => {
 
 const filteredProducts = computed(() => {
   const filtered = [...searchProducts.value]
+
   if (filter.value === 'low') {
     filtered.sort((a: any, b: any) => b.unit_amount - a.unit_amount)
   } else if (filter.value === 'high') {

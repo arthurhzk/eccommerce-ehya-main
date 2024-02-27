@@ -18,6 +18,7 @@
     "@stripe/stripe-js": "^3.0.5",
     "@supabase/supabase-js": "^2.39.7",
     "@vueuse/core": "^10.8.0",
+    "axios": "^1.6.7",
     "class-variance-authority": "^0.7.0",
     "clsx": "^2.1.0",
     "embla-carousel": "^8.0.0",
