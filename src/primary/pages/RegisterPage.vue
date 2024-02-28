@@ -1,3 +1,4 @@
+<!-- eslint-disable vue/require-v-for-key -->
 <template>
   <SideContainer class="lg:w-1/2 lg:mx-auto">
     <Card>
@@ -29,43 +30,71 @@
             <span class="bg-background px-2 text-muted-foreground">Ou continuar como</span>
           </div>
         </div>
-        <div class="grid gap-2">
-          <Label for="text">Nome Completo</Label>
-          <Input id="text" type="text" placeholder="John Doe" />
-        </div>
-        <div class="grid gap-2">
-          <Label for="email">Email</Label>
-          <Input id="email" type="email" placeholder="m@example.com" />
-        </div>
+        <form class="space-y-2" @submit="onSubmit">
+          <div class="grid gap-2">
+            <Label for="text">Nome</Label>
+            <Input v-model:modelValue="store.state.first_name" id="first_name" type="text" />
+            <div v-if="errors?.email" class="text-red-600">
+              <span v-for="error in errors?.first_name?._errors">{{ error }}</span>
+            </div>
+          </div>
+          <div class="grid gap-2">
+            <Label for="text">Sobrenome</Label>
+            <Input v-model:modelValue="store.state.last_name" id="last_name" type="text" />
+            <div v-if="errors?.email" class="text-red-600">
+              <span v-for="error in errors?.last_name?._errors">{{ error }}</span>
+            </div>
+          </div>
+          <div class="grid gap-2">
+            <Label for="email">Email</Label>
+            <Input v-model:modelValue="store.state.email" id="email" type="email" />
+            <div v-if="errors?.email" class="text-red-600">
+              <span v-for="error in errors?.email?._errors">{{ error }}</span>
+            </div>
+          </div>
 
-        <div class="grid gap-2">
-          <Label for="password">Senha</Label>
-          <Input id="password" type="password" />
-        </div>
-        <div class="grid gap-2">
-          <Label for="password">Confirme a sua Senha</Label>
-          <Input id="password" type="password" />
-        </div>
-        <div class="grid gap-2">
-          <Label for="city">Estado:</Label>
-          <select class="border rounded-md p-3" v-model="state" @change="handleStateChange">
-            <option class="mx-4" v-for="(state, index) in uf" :key="index" :value="state">
-              {{ state }}
-            </option>
-          </select>
-        </div>
-        <div class="grid gap-2">
-          <Label for="city">Cidade:</Label>
-          <select class="border rounded-md p-3">
-            <option v-for="city in alphabeticalCityOrder" :key="city.id" :value="city.nome">
-              {{ city.nome }}
-            </option>
-          </select>
-        </div>
+          <div class="grid gap-2">
+            <Label for="password">Senha</Label>
+            <Input v-model:modelValue="store.state.password" id="password" type="password" />
+            <div v-if="errors?.email" class="text-red-600">
+              <span v-for="error in errors?.password?._errors">{{ error }}</span>
+            </div>
+          </div>
+          <div class="grid gap-2">
+            <Label for="confirm_password">Confirme a sua Senha</Label>
+            <Input
+              v-model:modelValue="store.state.confirm_password"
+              id="confirm_password"
+              type="password"
+            />
+            <div v-if="errors?.email" class="text-red-600">
+              <span v-for="error in errors?.confirm_password?._errors">{{ error }}</span>
+            </div>
+          </div>
+          <div class="grid gap-2">
+            <Label for="city">Estado:</Label>
+            <select
+              class="border rounded-md p-2"
+              v-model="store.state.state"
+              @change="handleStateChange"
+            >
+              <option class="mx-4" v-for="(state, index) in uf" :key="index" :value="state">
+                {{ state }}
+              </option>
+            </select>
+          </div>
+          <div class="grid gap-2">
+            <Label for="city">Cidade:</Label>
+            <select v-model="store.state.city" class="border rounded-md p-2">
+              <option v-for="city in alphabeticalCityOrder" :key="city.id" :value="city.nome">
+                {{ city.nome }}
+              </option>
+            </select>
+          </div>
+          <Button type="submit" class="w-full">Registrar</Button>
+        </form>
       </CardContent>
-      <CardFooter>
-        <Button class="w-full">Registrar</Button>
-      </CardFooter>
+      <CardFooter> </CardFooter>
     </Card>
   </SideContainer>
 </template>
@@ -84,27 +113,47 @@ import {
 import Input from '@/primary/components/ui/input/Input.vue'
 import Label from '@/primary/components/ui/label/Label.vue'
 import Button from '@/primary/components/ui/button/Button.vue'
+import uf from '@/domain/data/uf'
 import axios from 'axios'
-import { onMounted, ref, computed } from 'vue'
+import { z } from 'zod'
+import { ref, computed } from 'vue'
+import useUserStore from '@/primary/infrastructure/store/user'
+const schema = z
+  .object({
+    first_name: z.string().min(2, 'Nome deve ter no mínimo 2 caracteres.'),
+    last_name: z.string().min(2, 'Sobrenome deve ter no mínimo 2 caracteres.'),
+    email: z.string().email('Email inválido.'),
+    password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres.'),
+    confirm_password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres.'),
+    isVerified: z.boolean().optional()
+  })
+  .refine((data) => data.password === data.confirm_password, {
+    message: 'As senhas não coincidem.',
+    path: ['confirm']
+  })
+
+const store = useUserStore()
+
+type formSchemaType = z.infer<typeof schema>
+
+const errors = ref<z.ZodFormattedError<formSchemaType> | null>(null)
+
 const callApi = async () => {
   await axios
-    .get(`https://servicodados.ibge.gov.br/api/v1/localidades/estados/${state}/distritos`)
+    .get(
+      `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${store.state.state}/distritos`
+    )
     .then((response) => {
       cities.value = response.data
       console.log(cities.value)
     })
 }
 
-let state = ''
-
 const cities = ref<City[] | null>(null)
-const handleStateChange = (value: any) => {
+const handleStateChange = () => {
   callApi()
 }
 
-onMounted(() => {
-  callApi()
-})
 interface City {
   nome: string
   id: number
@@ -127,33 +176,22 @@ const alphabeticalCityOrder = computed(() => {
   })
 })
 
-const uf = [
-  'AC',
-  'AL',
-  'AP',
-  'AM',
-  'BA',
-  'CE',
-  'DF',
-  'ES',
-  'GO',
-  'MA',
-  'MT',
-  'MS',
-  'MG',
-  'PA',
-  'PB',
-  'PR',
-  'PE',
-  'PI',
-  'RJ',
-  'RN',
-  'RS',
-  'RO',
-  'RR',
-  'SC',
-  'SP',
-  'SE',
-  'TO'
-]
+async function onSubmit(event: Event) {
+  event.preventDefault()
+
+  const validSchema = schema.safeParse({
+    email: store.state.email,
+    password: store.state.password,
+    first_name: store.state.first_name,
+    last_name: store.state.last_name,
+    confirm_password: store.state.confirm_password,
+    isVerified: false
+  })
+  if (!validSchema.success) {
+    errors.value = validSchema.error.format()
+  } else {
+    errors.value = null
+    await store.signUp()
+  }
+}
 </script>
