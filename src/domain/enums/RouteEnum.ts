@@ -10,5 +10,6 @@ export enum RouteNameEnum {
   CATEGORIESID = 'CategoriesID',
   ACCESSORIES = 'Accessories',
   NOT_FOUND = 'NotFound',
-  CART = 'Cart'
+  CART = 'Cart',
+  PROFILE = 'Profile'
 }

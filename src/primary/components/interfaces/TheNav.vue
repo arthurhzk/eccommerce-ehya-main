@@ -61,6 +61,14 @@
                   Produtos
                 </router-link>
               </li>
+              <li v-if="store.isLoggedIn">
+                <router-link
+                  :to="{ name: RouteNameEnum.PROFILE }"
+                  class="block py-2 px-3 text-gray-900 rounded hover:bg-gray-100 md:hover:bg-transparent md:border-0 md:hover:text-blue-700 md:p-0 dark:text-white md:dark:hover:text-blue-500 dark:hover:bg-gray-700 dark:hover:text-white md:dark:hover:bg-transparent"
+                >
+                  Perfil
+                </router-link>
+              </li>
 
               <li v-if="!store.isLoggedIn">
                 <router-link
@@ -90,7 +98,7 @@
                 <InfoSheet v-if="store.isLoggedIn" />
               </li>
               <li>
-                <SignOutModal @sign-out="signOut" v-if="store.isLoggedIn" />
+                <TheDropDown @sign-out="signOut" v-if="store.isLoggedIn" />
               </li>
             </ul>
           </div>
@@ -105,10 +113,10 @@ import { ref, watch } from 'vue'
 import SideContainer from '@/primary/components/container/SideContainer.vue'
 import { RouteNameEnum } from '@/domain/enums/RouteEnum'
 import { useRoute } from 'vue-router'
-import InfoSheet from '@/primary/components/interfaces/InfoSheet.vue'
 import useLoggedStore from '@/primary/infrastructure/store/logged'
-import SignOutModal from '@/primary/components/interfaces/SignOutModal.vue'
+import TheDropDown from '@/primary/components/interfaces/TheDropDown.vue'
 import useUserStore from '@/primary/infrastructure/store/user'
+
 const store = useLoggedStore()
 const { signOut } = useUserStore()
 const isOpen = ref(false)

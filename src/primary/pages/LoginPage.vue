@@ -44,7 +44,10 @@
         </div>
       </CardContent>
       <CardFooter>
-        <Button @click="handleLogin" class="w-full"> Acessar </Button>
+        <div class="flex flex-col mx-auto">
+          <Button @click="handleLogin" class="w-full"> Acessar </Button>
+          <p class="text-red-500 mt-4">{{ store.errorResponse }}</p>
+        </div>
       </CardFooter>
     </Card>
   </SideContainer>
@@ -66,11 +69,19 @@ import Label from '@/primary/components/ui/label/Label.vue'
 import Button from '@/primary/components/ui/button/Button.vue'
 import useUserStore from '@/primary/infrastructure/store/user'
 import { useRouter } from 'vue-router'
+import { ref } from 'vue'
 const store = useUserStore()
 const router = useRouter()
+
+const isValid = ref(true)
+
 const handleLogin = async () => {
   await store.signIn()
-  await store.getUser()
-  router.push('/')
+  if (store.accessToken) {
+    store.getUser()
+    router.push('/')
+  } else {
+    isValid.value = false
+  }
 }
 </script>

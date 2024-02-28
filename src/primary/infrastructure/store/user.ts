@@ -15,19 +15,26 @@ const useUserStore = defineStore('user', () => {
   const credentials = ref()
   const state = reactive(initialState)
   const store = useLoggedStore()
+  const accessToken = ref()
+  const errorResponse = ref()
   const signUp = async () => {
-    await supabase.auth.signUp({
-      email: state.email,
-      password: state.password,
-      options: {
-        data: {
-          name: state.first_name,
-          last_name: state.last_name,
-          city: state.city,
-          state: state.state
+    try {
+      const response = await supabase.auth.signUp({
+        email: state.email,
+        password: state.password,
+        options: {
+          data: {
+            name: state.first_name,
+            last_name: state.last_name,
+            city: state.city,
+            state: state.state
+          }
         }
-      }
-    })
+      })
+      accessToken.value = response.data.session?.access_token
+    } catch (error) {
+      console.log(error)
+    }
   }
 
   const signIn = async () => {
@@ -38,6 +45,7 @@ const useUserStore = defineStore('user', () => {
     })
     if (error) {
       store.setLoggedIn(false)
+      errorResponse.value = 'Senha ou email inválidos!'
       throw error
     }
   }
@@ -69,7 +77,17 @@ const useUserStore = defineStore('user', () => {
     }
   }
 
-  return { signUp, signIn, getUser, signOut, signInWithGithub, state, credentials }
+  return {
+    signUp,
+    signIn,
+    getUser,
+    signOut,
+    signInWithGithub,
+    state,
+    credentials,
+    accessToken,
+    errorResponse
+  }
 })
 
 export default useUserStore
