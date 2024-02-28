@@ -62,7 +62,7 @@
                 </router-link>
               </li>
 
-              <li>
+              <li v-if="!store.isLoggedIn">
                 <router-link
                   :to="{ name: RouteNameEnum.LOGIN }"
                   href="#"
@@ -70,7 +70,7 @@
                   >Login</router-link
                 >
               </li>
-              <li>
+              <li v-if="!store.isLoggedIn">
                 <router-link
                   :to="{ name: RouteNameEnum.REGISTER }"
                   href="#"
@@ -86,6 +86,12 @@
                   Carrinho
                 </router-link>
               </li>
+              <li>
+                <InfoSheet v-if="store.isLoggedIn" />
+              </li>
+              <li>
+                <SignOutModal @sign-out="signOut" v-if="store.isLoggedIn" />
+              </li>
             </ul>
           </div>
         </div>
@@ -99,7 +105,12 @@ import { ref, watch } from 'vue'
 import SideContainer from '@/primary/components/container/SideContainer.vue'
 import { RouteNameEnum } from '@/domain/enums/RouteEnum'
 import { useRoute } from 'vue-router'
-
+import InfoSheet from '@/primary/components/interfaces/InfoSheet.vue'
+import useLoggedStore from '@/primary/infrastructure/store/logged'
+import SignOutModal from '@/primary/components/interfaces/SignOutModal.vue'
+import useUserStore from '@/primary/infrastructure/store/user'
+const store = useLoggedStore()
+const { signOut } = useUserStore()
 const isOpen = ref(false)
 const route = useRoute()
 const toggleBurguer = () => {

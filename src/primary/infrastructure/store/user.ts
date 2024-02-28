@@ -1,7 +1,7 @@
 import { defineStore } from 'pinia'
 import supabase from '@/secondary/lib/supabase'
-import useLoading from '@/primary/infrastructure/composables/useLoading'
-import { reactive } from 'vue'
+import useLoggedStore from '@/primary/infrastructure/store/logged'
+import { reactive, ref } from 'vue'
 const useUserStore = defineStore('user', () => {
   const initialState = {
     first_name: '',
@@ -12,9 +12,9 @@ const useUserStore = defineStore('user', () => {
     city: '',
     state: ''
   }
-
+  const credentials = ref()
   const state = reactive(initialState)
-  const { setLoading } = useLoading()
+  const store = useLoggedStore()
   const signUp = async () => {
     await supabase.auth.signUp({
       email: state.email,
@@ -31,29 +31,45 @@ const useUserStore = defineStore('user', () => {
   }
 
   const signIn = async () => {
-    await supabase.auth.signInWithPassword({
+    store.setLoggedIn(true)
+    const { error } = await supabase.auth.signInWithPassword({
       email: state.email,
       password: state.password
     })
+    if (error) {
+      store.setLoggedIn(false)
+      throw error
+    }
   }
 
   const signOut = async () => {
     try {
-      setLoading(true)
+      store.setLoggedIn(false)
       const { error } = await supabase.auth.signOut()
       if (error) throw error
     } catch (error) {
       console.error('Erro ao desconectar!', error)
-    } finally {
-      setLoading(false)
+      store.setLoggedIn(true)
     }
   }
 
   const getUser = async () => {
-    await supabase.auth.getUser()
+    const response = await supabase.auth.getUser()
+    if (response) {
+      credentials.value = response.data.user?.user_metadata
+    }
   }
 
-  return { signUp, signIn, getUser, signOut, state }
+  const signInWithGithub = async () => {
+    const { error } = await supabase.auth.signInWithOAuth({
+      provider: 'github'
+    })
+    if (error) {
+      throw error
+    }
+  }
+
+  return { signUp, signIn, getUser, signOut, signInWithGithub, state, credentials }
 })
 
 export default useUserStore

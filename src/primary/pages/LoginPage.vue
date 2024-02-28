@@ -7,7 +7,7 @@
       </CardHeader>
       <CardContent class="grid gap-4">
         <div class="grid grid-cols-2 gap-6">
-          <Button variant="outline">
+          <Button @click="store.signInWithGithub" variant="outline">
             <GithubIcon class="mr-2 h-4 w-4" />
             Github
           </Button>
@@ -31,15 +31,20 @@
         </div>
         <div class="grid gap-2">
           <Label for="email">Email</Label>
-          <Input id="email" type="email" placeholder="m@example.com" />
+          <Input
+            v-model:modelValue="store.state.email"
+            id="email"
+            type="email"
+            placeholder="m@example.com"
+          />
         </div>
         <div class="grid gap-2">
           <Label for="password">Senha</Label>
-          <Input id="password" type="password" />
+          <Input v-model:modelValue="store.state.password" id="password" type="password" />
         </div>
       </CardContent>
       <CardFooter>
-        <Button class="w-full"> Acessar </Button>
+        <Button @click="handleLogin" class="w-full"> Acessar </Button>
       </CardFooter>
     </Card>
   </SideContainer>
@@ -59,4 +64,13 @@ import {
 import Input from '@/primary/components/ui/input/Input.vue'
 import Label from '@/primary/components/ui/label/Label.vue'
 import Button from '@/primary/components/ui/button/Button.vue'
+import useUserStore from '@/primary/infrastructure/store/user'
+import { useRouter } from 'vue-router'
+const store = useUserStore()
+const router = useRouter()
+const handleLogin = async () => {
+  await store.signIn()
+  await store.getUser()
+  router.push('/')
+}
 </script>
