@@ -38,11 +38,6 @@ const useUserStore = defineStore('user', () => {
         }
       })
       accessToken.value = response.data.session?.access_token
-      toast({
-        title: 'Cadastro realizado com sucesso!',
-        description: 'Você foi cadastrado com sucesso!',
-        class: 'bg-green-500 text-white'
-      })
     } catch (error) {
       toast({
         title: 'Erro ao cadastrar!',

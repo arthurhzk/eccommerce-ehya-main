@@ -34,21 +34,21 @@
           <div class="grid gap-2">
             <Label for="text">Nome</Label>
             <Input v-model:modelValue="store.state.first_name" id="first_name" type="text" />
-            <div v-if="errors?.email" class="text-red-600">
+            <div vif="errors?.email" class="text-red-600">
               <span v-for="error in errors?.first_name?._errors">{{ error }}</span>
             </div>
           </div>
           <div class="grid gap-2">
             <Label for="text">Sobrenome</Label>
             <Input v-model:modelValue="store.state.last_name" id="last_name" type="text" />
-            <div v-if="errors?.email" class="text-red-600">
+            <div vif="errors?.email" class="text-red-600">
               <span v-for="error in errors?.last_name?._errors">{{ error }}</span>
             </div>
           </div>
           <div class="grid gap-2">
             <Label for="email">Email</Label>
             <Input v-model:modelValue="store.state.email" id="email" type="email" />
-            <div v-if="errors?.email" class="text-red-600">
+            <div vif="errors?.email" class="text-red-600">
               <span v-for="error in errors?.email?._errors">{{ error }}</span>
             </div>
           </div>
@@ -56,7 +56,7 @@
           <div class="grid gap-2">
             <Label for="password">Senha</Label>
             <Input v-model:modelValue="store.state.password" id="password" type="password" />
-            <div v-if="errors?.email" class="text-red-600">
+            <div vif="errors?.email" class="text-red-600">
               <span v-for="error in errors?.password?._errors">{{ error }}</span>
             </div>
           </div>
@@ -67,8 +67,10 @@
               id="confirm_password"
               type="password"
             />
-            <div v-if="errors?.email" class="text-red-600">
-              <span v-for="error in errors?.confirm_password?._errors">{{ error }}</span>
+            <div class="text-red-600">
+              <span v-if="store.state.password !== store.state.confirm_password">
+                As senhas não coincidem.
+              </span>
             </div>
           </div>
           <div class="grid gap-2">
@@ -91,7 +93,7 @@
               </option>
             </select>
           </div>
-          <Button type="submit" class="w-full">Registrar</Button>
+          <Button @click="onSubmit" class="w-full">Registrar</Button>
         </form>
       </CardContent>
       <CardFooter> </CardFooter>
@@ -118,17 +120,18 @@ import { z } from 'zod'
 import { ref, computed } from 'vue'
 import useUserStore from '@/primary/infrastructure/store/user'
 import { fetchCitiesByState } from '@/secondary/services/ibgeDataProvider'
+import { useToast } from '@/primary/components/ui/toast/use-toast'
+const { toast } = useToast()
 const schema = z
   .object({
-    first_name: z.string().min(2, 'Nome deve ter no mínimo 2 caracteres.'),
-    last_name: z.string().min(2, 'Sobrenome deve ter no mínimo 2 caracteres.'),
+    first_name: z.string().min(2, 'Nome é obrigatório.'),
+    last_name: z.string().min(2, 'Sobrenome é obrigatório.'),
     email: z.string().email('Email inválido.'),
     password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres.'),
     confirm_password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres.'),
     isVerified: z.boolean().optional()
   })
   .refine((data) => data.password === data.confirm_password, {
-    message: 'As senhas não coincidem.',
     path: ['confirm']
   })
 
@@ -185,11 +188,25 @@ async function onSubmit(event: Event) {
     confirm_password: store.state.confirm_password,
     isVerified: false
   })
+
   if (!validSchema.success) {
     errors.value = validSchema.error.format()
   } else {
-    errors.value = null
-    await store.signUp()
+    try {
+      await store.signUp()
+      errors.value = null
+      toast({
+        title: 'Cadastro realizado com sucesso!',
+        description: 'Você foi cadastrado com sucesso!',
+        class: 'bg-green-500 text-white'
+      })
+    } catch (error) {
+      toast({
+        title: 'Erro ao cadastrar!',
+        description: 'Verifique os campos e tente novamente.',
+        class: 'bg-red-500 text-white'
+      })
+    }
   }
 }
 </script>
