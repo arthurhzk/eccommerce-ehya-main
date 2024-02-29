@@ -94,9 +94,7 @@
                   Carrinho
                 </router-link>
               </li>
-              <li>
-                <InfoSheet v-if="store.isLoggedIn" />
-              </li>
+
               <li>
                 <TheDropDown @sign-out="signOut" v-if="store.isLoggedIn" />
               </li>

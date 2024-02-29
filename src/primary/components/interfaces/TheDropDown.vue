@@ -32,7 +32,7 @@
 
 <script setup lang="ts">
 import { CreditCard, LifeBuoy, LogOut, User } from 'lucide-vue-next'
-import { Button } from '@/primary/components/ui/button'
+import Button from '@/primary/components/ui/button/Button.vue'
 import {
   DropdownMenu,
   DropdownMenuContent,

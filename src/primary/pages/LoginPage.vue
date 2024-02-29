@@ -64,24 +64,33 @@ import {
   CardHeader,
   CardTitle
 } from '@/primary/components/ui/card'
+
 import Input from '@/primary/components/ui/input/Input.vue'
 import Label from '@/primary/components/ui/label/Label.vue'
 import Button from '@/primary/components/ui/button/Button.vue'
 import useUserStore from '@/primary/infrastructure/store/user'
 import { useRouter } from 'vue-router'
-import { ref } from 'vue'
+import { RouteNameEnum } from '@/domain/enums/RouteEnum'
+import { useToast } from '@/primary/components/ui/toast/use-toast'
 const store = useUserStore()
 const router = useRouter()
-
-const isValid = ref(true)
-
+const { toast } = useToast()
 const handleLogin = async () => {
-  await store.signIn()
-  if (store.accessToken) {
+  try {
+    await store.signIn()
+    router.push({ name: RouteNameEnum.HOME })
     store.getUser()
-    router.push('/')
-  } else {
-    isValid.value = false
+    toast({
+      title: 'Bem-vindo',
+      description: 'Você está logado',
+      class: 'bg-green-500 text-white'
+    })
+  } catch (error) {
+    toast({
+      title: 'Erro',
+      description: 'Verifique o email e a senha e tente novamente',
+      variant: 'destructive'
+    })
   }
 }
 </script>
