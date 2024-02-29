@@ -183,9 +183,6 @@ import CategoryCard from '@/primary/components/interfaces/CategoryCard.vue'
 import ServiceCard from '@/primary/components/interfaces/ServiceCard.vue'
 import categories from '@/domain/data/categories'
 import services from '@/domain/data/services'
-import useUserStore from '@/primary/infrastructure/store/user'
-
-const store = useUserStore()
 
 onMounted(() => {
   const observer = new IntersectionObserver((entries) => {

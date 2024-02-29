@@ -85,9 +85,7 @@ const { latestSeenProducts } = useSeenStore()
 // eslint-disable-next-line vue/no-async-in-computed-properties
 const stripe = computed(async () => {
   // eslint-disable-next-line vue/no-async-in-computed-properties
-  const response = await loadStripe(
-    'pk_test_51OjqQGCFji4mq3F4hgkPYVf65gcT2v08pVXBYGcqYmq6aUATE6m6CnNUjlgjGLfoApudnKFZpTBVOFLOxun2Frr400mbvaBpkY'
-  )
+  const response = await loadStripe(import.meta.env.VITE_LOAD_STRIPE)
   return response
 })
 
@@ -106,7 +104,7 @@ const redirect = async () => {
       mode: 'payment'
     })
   } else {
-    console.error('Stripe has not been properly initialized.')
+    console.error()
   }
   return { redirect }
 }

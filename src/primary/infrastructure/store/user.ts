@@ -23,6 +23,7 @@ const useUserStore = defineStore('user', () => {
   const accessToken = ref()
   const errorResponse = ref()
   const router = useRouter()
+  const emailValue = ref('')
   const signUp = async () => {
     try {
       const response = await supabase.auth.signUp({
@@ -49,7 +50,7 @@ const useUserStore = defineStore('user', () => {
 
   const signIn = async () => {
     store.setLoggedIn(true)
-    const { error } = await supabase.auth.signInWithPassword({
+    const { data, error } = await supabase.auth.signInWithPassword({
       email: state.email,
       password: state.password
     })
@@ -85,6 +86,7 @@ const useUserStore = defineStore('user', () => {
     const response = await supabase.auth.getUser()
     if (response) {
       credentials.value = response.data.user?.user_metadata
+      emailValue.value = response.data.user?.email || ''
     }
   }
 
@@ -92,6 +94,7 @@ const useUserStore = defineStore('user', () => {
     const { error } = await supabase.auth.signInWithOAuth({
       provider: 'github'
     })
+
     if (error) {
       throw error
     }
@@ -106,7 +109,8 @@ const useUserStore = defineStore('user', () => {
     state,
     credentials,
     accessToken,
-    errorResponse
+    errorResponse,
+    emailValue
   }
 })
 
