@@ -114,10 +114,10 @@ import Input from '@/primary/components/ui/input/Input.vue'
 import Label from '@/primary/components/ui/label/Label.vue'
 import Button from '@/primary/components/ui/button/Button.vue'
 import uf from '@/domain/data/uf'
-import axios from 'axios'
 import { z } from 'zod'
 import { ref, computed } from 'vue'
 import useUserStore from '@/primary/infrastructure/store/user'
+import { fetchCitiesByState } from '@/secondary/services/ibgeDataProvider'
 const schema = z
   .object({
     first_name: z.string().min(2, 'Nome deve ter no mínimo 2 caracteres.'),
@@ -139,14 +139,12 @@ type formSchemaType = z.infer<typeof schema>
 const errors = ref<z.ZodFormattedError<formSchemaType> | null>(null)
 
 const callApi = async () => {
-  await axios
-    .get(
-      `https://servicodados.ibge.gov.br/api/v1/localidades/estados/${store.state.state}/distritos`
-    )
-    .then((response) => {
-      cities.value = response.data
-      console.log(cities.value)
-    })
+  try {
+    const citiesData = await fetchCitiesByState(store.state.state)
+    cities.value = citiesData
+  } catch (error) {
+    console.error('Error fetching cities:', error)
+  }
 }
 
 const cities = ref<City[] | null>(null)

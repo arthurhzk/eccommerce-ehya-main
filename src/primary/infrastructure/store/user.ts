@@ -2,6 +2,9 @@ import { defineStore } from 'pinia'
 import supabase from '@/secondary/lib/supabase'
 import useLoggedStore from '@/primary/infrastructure/store/logged'
 import { reactive, ref } from 'vue'
+import { RouteNameEnum } from '@/domain/enums/RouteEnum'
+import { useRouter } from 'vue-router'
+import { useToast } from '@/primary/components/ui/toast/use-toast'
 const useUserStore = defineStore('user', () => {
   const initialState = {
     first_name: '',
@@ -12,11 +15,14 @@ const useUserStore = defineStore('user', () => {
     city: '',
     state: ''
   }
+
+  const { toast } = useToast()
   const credentials = ref()
   const state = reactive(initialState)
   const store = useLoggedStore()
   const accessToken = ref()
   const errorResponse = ref()
+  const router = useRouter()
   const signUp = async () => {
     try {
       const response = await supabase.auth.signUp({
@@ -32,8 +38,17 @@ const useUserStore = defineStore('user', () => {
         }
       })
       accessToken.value = response.data.session?.access_token
+      toast({
+        title: 'Cadastro realizado com sucesso!',
+        description: 'Você foi cadastrado com sucesso!',
+        class: 'bg-green-500 text-white'
+      })
     } catch (error) {
-      console.log(error)
+      toast({
+        title: 'Erro ao cadastrar!',
+        description: 'Ocorreu um erro ao cadastrar, tente novamente!',
+        variant: 'destructive'
+      })
     }
   }
 
@@ -53,10 +68,20 @@ const useUserStore = defineStore('user', () => {
   const signOut = async () => {
     try {
       store.setLoggedIn(false)
+      router.push({ name: RouteNameEnum.HOME })
+      toast({
+        title: 'Desconectado!',
+        description: 'Você foi desconectado com sucesso!',
+        class: 'bg-green-500 text-white'
+      })
       const { error } = await supabase.auth.signOut()
       if (error) throw error
     } catch (error) {
-      console.error('Erro ao desconectar!', error)
+      toast({
+        title: 'Erro ao desconectar!',
+        description: 'Ocorreu um erro ao desconectar, tente novamente!',
+        variant: 'destructive'
+      })
       store.setLoggedIn(true)
     }
   }
