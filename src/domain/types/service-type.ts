@@ -3,4 +3,5 @@ export default interface Service {
   image: string
   title: string
   description: string
+  amount: number
 }

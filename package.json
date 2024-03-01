@@ -14,9 +14,9 @@
     "format": "prettier --write src/"
   },
   "dependencies": {
-    "@googlemaps/js-api-loader": "^1.16.6",
     "@stripe/stripe-js": "^3.0.5",
     "@supabase/supabase-js": "^2.39.7",
+    "@tanstack/vue-table": "^8.13.2",
     "@vueuse/core": "^10.8.0",
     "axios": "^1.6.7",
     "class-variance-authority": "^0.7.0",
