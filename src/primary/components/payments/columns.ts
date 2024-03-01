@@ -1,14 +1,17 @@
 import type { ColumnDef } from '@tanstack/vue-table'
 import type { Payment } from '@/domain/types/payment.type'
 import { h } from 'vue'
-import DropdownAction from '@/primary/components/payments/DataTableDropdown.vue'
-import { ArrowUpDown, ChevronDown } from 'lucide-vue-next'
+import { ArrowUpDown } from 'lucide-vue-next'
 import Button from '@/primary/components/ui/button/Button.vue'
-import Checkbox from '@/primary/components/ui/checkbox/Checkbox.vue'
 export const columns: ColumnDef<Payment>[] = [
   {
+    accessorKey: 'id',
+    header: () => h('div', 'ID do pagamento'),
+    cell: ({ row }) => h('div', row.getValue('id'))
+  },
+  {
     accessorKey: 'amount',
-    header: () => h('div', { class: 'text-right' }, 'Amount'),
+    header: () => h('div', 'Valor total'),
     cell: ({ row }) => {
       const amount = parseFloat(row.getValue('amount'))
       const formatted = new Intl.NumberFormat('en-US', {
@@ -16,9 +19,10 @@ export const columns: ColumnDef<Payment>[] = [
         currency: 'USD'
       }).format(amount)
 
-      return h('div', { class: 'text-right font-medium' }, formatted)
+      return h('div', formatted)
     }
   },
+
   {
     accessorKey: 'email',
     header: ({ column }) => {
@@ -32,37 +36,5 @@ export const columns: ColumnDef<Payment>[] = [
       )
     },
     cell: ({ row }) => h('div', { class: 'lowercase' }, row.getValue('email'))
-  },
-  {
-    id: 'select',
-    header: ({ table }) =>
-      h(Checkbox, {
-        checked: table.getIsAllPageRowsSelected(),
-        'onUpdate:checked': (value: boolean) => table.toggleAllPageRowsSelected(!!value),
-        ariaLabel: 'Select all'
-      }),
-    cell: ({ row }) =>
-      h(Checkbox, {
-        checked: row.getIsSelected(),
-        'onUpdate:checked': (value: boolean) => row.toggleSelected(!!value),
-        ariaLabel: 'Select row'
-      }),
-    enableSorting: false,
-    enableHiding: false
-  },
-  {
-    id: 'actions',
-    enableHiding: false,
-    cell: ({ row }) => {
-      const payment = row.original
-
-      return h(
-        'div',
-        { class: 'relative' },
-        h(DropdownAction, {
-          payment
-        })
-      )
-    }
   }
 ]

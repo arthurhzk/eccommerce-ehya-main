@@ -1,16 +1,6 @@
 <template>
   <div>
-    <div class="flex-1 text-sm text-muted-foreground">
-      {{ table.getFilteredSelectedRowModel().rows.length }} of
-      {{ table.getFilteredRowModel().rows.length }} row(s) selected.
-    </div>
     <div class="flex items-center py-4">
-      <Input
-        class="max-w-sm"
-        placeholder="Filter emails..."
-        :model-value="table.getColumn('email')?.getFilterValue() as string"
-        @update:model-value="table.getColumn('email')?.setFilterValue($event)"
-      />
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <Button variant="outline" class="ml-auto">
@@ -25,7 +15,7 @@
             class="capitalize"
             :checked="column.getIsVisible()"
             @update:checked="
-              (value) => {
+              (value: any) => {
                 column.toggleVisibility(!!value)
               }
             "
@@ -69,6 +59,24 @@
           </template>
         </TableBody>
       </Table>
+      <div class="flex items-center justify-end py-4 space-x-2 mr-4">
+        <Button
+          variant="outline"
+          size="sm"
+          :disabled="!table.getCanPreviousPage()"
+          @click="table.previousPage()"
+        >
+          Previous
+        </Button>
+        <Button
+          variant="outline"
+          size="sm"
+          :disabled="!table.getCanNextPage()"
+          @click="table.nextPage()"
+        >
+          Next
+        </Button>
+      </div>
     </div>
   </div>
 </template>
@@ -81,8 +89,8 @@ import type {
   VisibilityState
 } from '@tanstack/vue-table'
 
-import { ArrowUpDown, ChevronDown } from 'lucide-vue-next'
-import { h, ref } from 'vue'
+import { ChevronDown } from 'lucide-vue-next'
+import { ref } from 'vue'
 import {
   FlexRender,
   getCoreRowModel,
@@ -93,7 +101,7 @@ import {
 } from '@tanstack/vue-table'
 
 import Button from '@/primary/components/ui/button/Button.vue'
-import Input from '@/primary/components/ui/input/Input.vue'
+
 import { valueUpdater } from '@/secondary/lib/utils'
 import {
   Table,

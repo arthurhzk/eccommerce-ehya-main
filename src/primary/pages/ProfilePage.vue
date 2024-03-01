@@ -23,7 +23,7 @@ const filterTransactionByUser = computed(() => {
 const rowPurchases = computed(() => {
   return filterTransactionByUser.value.map((transaction: any) => {
     return {
-      id: transaction.id,
+      id: transaction.id.slice(0, 20),
       status: transaction.status,
       email: transaction.customer_details?.email,
       amount: (transaction.amount_total / 100).toFixed(2)
