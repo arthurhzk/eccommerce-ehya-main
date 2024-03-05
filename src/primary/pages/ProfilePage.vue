@@ -26,7 +26,8 @@ const rowPurchases = computed(() => {
       id: transaction.id.slice(0, 20),
       status: transaction.status,
       email: transaction.customer_details?.email,
-      amount: (transaction.amount_total / 100).toFixed(2)
+      amount: (transaction.amount_total / 100).toFixed(2),
+      created: new Date(transaction.created * 1000).toLocaleDateString()
     }
   })
 })
@@ -38,5 +39,6 @@ async function getData(): Promise<Payment[]> {
 
 onMounted(async () => {
   data.value = await getData()
+  console.log(transactions.value)
 })
 </script>

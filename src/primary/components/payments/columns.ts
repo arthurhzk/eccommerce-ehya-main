@@ -9,6 +9,7 @@ export const columns: ColumnDef<Payment>[] = [
     header: () => h('div', 'ID do pagamento'),
     cell: ({ row }) => h('div', row.getValue('id'))
   },
+
   {
     accessorKey: 'amount',
     header: () => h('div', 'Valor total'),
@@ -22,6 +23,11 @@ export const columns: ColumnDef<Payment>[] = [
       return h('div', formatted)
     }
   },
+  {
+    accessorKey: 'created',
+    header: () => h('div', 'Data'),
+    cell: ({ row }) => h('div', row.getValue('created'))
+  },
 
   {
     accessorKey: 'email',
@@ -32,7 +38,7 @@ export const columns: ColumnDef<Payment>[] = [
           variant: 'ghost',
           onClick: () => column.toggleSorting(column.getIsSorted() === 'asc')
         },
-        () => ['Email', h(ArrowUpDown, { class: 'ml-2 h-4 w-4' })]
+        () => ['Email', { class: 'ml-2 h-4 w-4' }]
       )
     },
     cell: ({ row }) => h('div', { class: 'lowercase' }, row.getValue('email'))

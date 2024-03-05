@@ -4,7 +4,7 @@
       <DropdownMenu>
         <DropdownMenuTrigger as-child>
           <Button variant="outline" class="ml-auto">
-            Columns
+            Colunas
             <ChevronDown class="w-4 h-4 ml-2" />
           </Button>
         </DropdownMenuTrigger>
@@ -53,7 +53,7 @@
           <template v-else>
             <TableRow>
               <TableCell :colSpan="columns.length" class="h-24 text-center">
-                No results.
+                Sem resultados.
               </TableCell>
             </TableRow>
           </template>
@@ -66,7 +66,7 @@
           :disabled="!table.getCanPreviousPage()"
           @click="table.previousPage()"
         >
-          Previous
+          Anterior
         </Button>
         <Button
           variant="outline"
@@ -74,7 +74,7 @@
           :disabled="!table.getCanNextPage()"
           @click="table.nextPage()"
         >
-          Next
+          Próximo
         </Button>
       </div>
     </div>
