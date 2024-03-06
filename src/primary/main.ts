@@ -5,8 +5,11 @@ import { createPinia } from 'pinia'
 
 import App from './App.vue'
 import router from '@/primary/infrastructure/router'
+import { registerServices } from '@/secondary/dependency-injection'
 
 const app = createApp(App)
+
+registerServices(app)
 
 app.use(createPinia())
 

@@ -88,8 +88,8 @@
           <div class="grid gap-2">
             <Label for="city">Cidade:</Label>
             <select v-model="store.state.city" class="border rounded-md p-2">
-              <option v-for="city in alphabeticalCityOrder" :key="city.id" :value="city.nome">
-                {{ city.nome }}
+              <option v-for="city in alphabeticalCityOrder" :key="city.id" :value="city.name">
+                {{ city.name }}
               </option>
             </select>
           </div>
@@ -110,7 +110,7 @@ import {
   CardDescription,
   CardFooter,
   CardHeader,
-  CardTitle
+  CardTitle,
 } from '@/primary/components/ui/card'
 import Input from '@/primary/components/ui/input/Input.vue'
 import Label from '@/primary/components/ui/label/Label.vue'
@@ -119,9 +119,17 @@ import uf from '@/domain/data/uf'
 import { z } from 'zod'
 import { ref, computed } from 'vue'
 import useUserStore from '@/primary/infrastructure/store/user'
-import { fetchCitiesByState } from '@/secondary/services/ibgeDataProvider'
 import { useToast } from '@/primary/components/ui/toast/use-toast'
+import type { CityModel } from '@/domain/types/city-model'
+import type { GeoStatisticService } from '@/secondary/services/abstractions/geo-statistic-service'
+import { injectSafe } from '@/secondary/dependency-injection'
+
+type FormSchemaType = z.infer<typeof schema>
+
+const geoStatisticService = injectSafe<GeoStatisticService>('GeoStatisticService')
+
 const { toast } = useToast()
+const store = useUserStore()
 const schema = z
   .object({
     first_name: z.string().min(2, 'Nome é obrigatório.'),
@@ -129,36 +137,14 @@ const schema = z
     email: z.string().email('Email inválido.'),
     password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres.'),
     confirm_password: z.string().min(6, 'Senha deve ter no mínimo 6 caracteres.'),
-    isVerified: z.boolean().optional()
+    isVerified: z.boolean().optional(),
   })
   .refine((data) => data.password === data.confirm_password, {
-    path: ['confirm']
+    path: ['confirm'],
   })
 
-const store = useUserStore()
-
-type formSchemaType = z.infer<typeof schema>
-
-const errors = ref<z.ZodFormattedError<formSchemaType> | null>(null)
-
-const callApi = async () => {
-  try {
-    const citiesData = await fetchCitiesByState(store.state.state)
-    cities.value = citiesData
-  } catch (error) {
-    console.error('Error fetching cities:', error)
-  }
-}
-
-const cities = ref<City[] | null>(null)
-const handleStateChange = () => {
-  callApi()
-}
-
-interface City {
-  nome: string
-  id: number
-}
+const cities = ref<CityModel[] | null>(null)
+const errors = ref<z.ZodFormattedError<FormSchemaType> | null>(null)
 
 const alphabeticalCityOrder = computed(() => {
   if (cities.value === null) {
@@ -177,6 +163,19 @@ const alphabeticalCityOrder = computed(() => {
   })
 })
 
+const callApi = async () => {
+  try {
+    const citiesData = await geoStatisticService?.getCitiesByState(store.state.state)
+    cities.value = citiesData
+  } catch (error) {
+    console.error('Error fetching cities:', error)
+  }
+}
+
+const handleStateChange = () => {
+  callApi()
+}
+
 async function onSubmit(event: Event) {
   event.preventDefault()
 
@@ -186,7 +185,7 @@ async function onSubmit(event: Event) {
     first_name: store.state.first_name,
     last_name: store.state.last_name,
     confirm_password: store.state.confirm_password,
-    isVerified: false
+    isVerified: false,
   })
 
   if (!validSchema.success) {
@@ -198,13 +197,13 @@ async function onSubmit(event: Event) {
       toast({
         title: 'Cadastro realizado com sucesso!',
         description: 'Você foi cadastrado com sucesso!',
-        class: 'bg-green-500 text-white'
+        class: 'bg-green-500 text-white',
       })
     } catch (error) {
       toast({
         title: 'Erro ao cadastrar!',
         description: 'Verifique os campos e tente novamente.',
-        class: 'bg-red-500 text-white'
+        class: 'bg-red-500 text-white',
       })
     }
   }
