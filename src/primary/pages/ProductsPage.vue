@@ -69,6 +69,7 @@ const { addToCart } = useCartStore()
 
 const search = ref('')
 const filter = ref('')
+
 onMounted(() => {
   fetchProducts()
   fetchPrices()
@@ -86,7 +87,6 @@ const searchProducts = computed(() => {
 
 const filteredProducts = computed(() => {
   const filtered = [...searchProducts.value]
-
   if (filter.value === 'low') {
     filtered.sort((a: any, b: any) => b.unit_amount - a.unit_amount)
   } else if (filter.value === 'high') {
