@@ -88,8 +88,8 @@
           <div class="grid gap-2">
             <Label for="city">Cidade:</Label>
             <select v-model="store.state.city" class="border rounded-md p-2">
-              <option v-for="city in alphabeticalCityOrder" :key="city.id" :value="city.nome">
-                {{ city.nome }}
+              <option v-for="city in alphabeticalCityOrder" :key="city.id" :value="city.name">
+                {{ city.name }}
               </option>
             </select>
           </div>
@@ -119,9 +119,17 @@ import uf from '@/domain/data/uf'
 import { z } from 'zod'
 import { ref, computed } from 'vue'
 import useUserStore from '@/primary/infrastructure/store/user'
-import { fetchCitiesByState } from '@/secondary/services/ibgeDataProvider'
 import { useToast } from '@/primary/components/ui/toast/use-toast'
+import type { CityModel } from '@/domain/types/city-model'
+import type { GeoStatisticService } from '@/secondary/services/abstractions/geo-statistic-service'
+import { injectSafe } from '@/secondary/services/dependency-injection'
+
+type FormSchemaType = z.infer<typeof schema>
+
+const geoStatisticService = injectSafe<GeoStatisticService>('GeoStatisticService')
+
 const { toast } = useToast()
+const store = useUserStore()
 const schema = z
   .object({
     first_name: z.string().min(2, 'Nome é obrigatório.'),
@@ -135,30 +143,8 @@ const schema = z
     path: ['confirm']
   })
 
-const store = useUserStore()
-
-type formSchemaType = z.infer<typeof schema>
-
-const errors = ref<z.ZodFormattedError<formSchemaType> | null>(null)
-
-const callApi = async () => {
-  try {
-    const citiesData = await fetchCitiesByState(store.state.state)
-    cities.value = citiesData
-  } catch (error) {
-    console.error('Error fetching cities:', error)
-  }
-}
-
-const cities = ref<City[] | null>(null)
-const handleStateChange = () => {
-  callApi()
-}
-
-interface City {
-  nome: string
-  id: number
-}
+const cities = ref<CityModel[] | null>(null)
+const errors = ref<z.ZodFormattedError<FormSchemaType> | null>(null)
 
 const alphabeticalCityOrder = computed(() => {
   if (cities.value === null) {
@@ -167,15 +153,28 @@ const alphabeticalCityOrder = computed(() => {
 
   // eslint-disable-next-line vue/no-side-effects-in-computed-properties
   return cities.value.sort((a: any, b: any) => {
-    if (a.nome > b.nome) {
+    if (a.name > b.name) {
       return -1
     }
-    if (a.nome < b.nome) {
+    if (a.name < b.name) {
       return 1
     }
     return 0
   })
 })
+
+const callApi = async () => {
+  try {
+    const citiesData = await geoStatisticService?.getCitiesByState(store.state.state)
+    cities.value = citiesData
+  } catch (error) {
+    console.error('Error fetching cities:', error)
+  }
+}
+
+const handleStateChange = () => {
+  callApi()
+}
 
 async function onSubmit(event: Event) {
   event.preventDefault()

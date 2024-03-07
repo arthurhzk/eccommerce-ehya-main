@@ -1,7 +1,6 @@
 import type { ColumnDef } from '@tanstack/vue-table'
 import type { Payment } from '@/domain/types/payment.type'
 import { h } from 'vue'
-import { ArrowUpDown } from 'lucide-vue-next'
 import Button from '@/primary/components/ui/button/Button.vue'
 export const columns: ColumnDef<Payment>[] = [
   {
