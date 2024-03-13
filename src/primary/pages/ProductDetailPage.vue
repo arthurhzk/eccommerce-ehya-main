@@ -1,6 +1,11 @@
 <template>
   <section>
     <SideContainer>
+      <TheBreadcrumb
+        v-if="searchProductById"
+        :product-name="searchProductById.name"
+        class="my-10"
+      />
       <div v-if="searchProductById">
         <div class="lg:flex lg:justify-around lg:items-center">
           <div class="md:flex lg:w-1/3">
@@ -11,7 +16,7 @@
             </swiper>
           </div>
 
-          <div class="lg:flex lg:flex-col">
+          <div class="lg:flex lg:flex-col lg:relative lg:ml-14 lg:right-40">
             <h1
               class="text-3xl text-text-blue font-bold leading-10 md:text-center uppercase ml-5 mt-6"
             >
@@ -46,7 +51,17 @@
             description="No máximo 30 dias após o recebimento do produto."
           />
         </div>
-        <ProductReview />
+      </div>
+      <div class="space-y-4">
+        <h3 class="text-2xl text-text-blue font-bold leading-10 uppercase mt-10">
+          Comentários do produto.
+        </h3>
+        <p v-if="filteredReviews.length === 0">Nenhum comentário, seja o primeiro a avaliar!</p>
+        <ProductReview v-for="review in filteredReviews" :reviews="review" :key="review.id" />
+        <AlertModal
+          @add-review="createReview(id, credentials.name, comments.review)"
+          v-model:review="comments.review"
+        />
       </div>
     </SideContainer>
   </section>
@@ -66,14 +81,42 @@ import { onMounted, computed } from 'vue'
 import { useCartStore } from '@/primary/infrastructure/store/cart'
 import useSeenStore from '@/primary/infrastructure/store/seen-product'
 import TheToast from '@/primary/components/interfaces/TheToast.vue'
+import TheBreadcrumb from '@/primary/components/interfaces/TheBreadcrumb.vue'
 import { loadStripe } from '@stripe/stripe-js'
-
+import { ref } from 'vue'
+import useCreateReview from '@/primary/infrastructure/composables/useCreateReview'
 import ProductReview from '@/primary/components/interfaces/ProductReview.vue'
+import AlertModal from '@/primary/components/interfaces/AlertModal.vue'
+import useUserStore from '@/primary/infrastructure/store/user'
+
 const { fetchPrices, fetchProducts, mergeStripeArray } = useFetchProducts()
 const { addToCart } = useCartStore()
 const modules = [Navigation]
 
 const router = useRouter()
+
+const { getUser, credentials } = useUserStore()
+
+const id = ref(router.currentRoute.value.params.id)
+const comments = ref({
+  name: '',
+  review: ''
+})
+const { fetchReviews, reviews, createReview } = useCreateReview()
+
+const filteredReviews = computed(() => {
+  return reviews.value.filter((review: any) => review.id === id.value)
+})
+
+onMounted(async () => {
+  await fetchProducts()
+  await fetchPrices()
+  await fetchReviews()
+  await getUser()
+
+  latestSeenProducts(searchProductById.value)
+})
+
 const searchProductById = computed(() => {
   const id = router.currentRoute.value.params.id
 
@@ -108,10 +151,4 @@ const redirect = async () => {
   }
   return { redirect }
 }
-
-onMounted(async () => {
-  await fetchProducts()
-  await fetchPrices()
-  latestSeenProducts(searchProductById.value)
-})
 </script>

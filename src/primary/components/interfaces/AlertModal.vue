@@ -8,12 +8,8 @@
         <AlertDialogTitle class="text-text-blue">Escreva o seu review</AlertDialogTitle>
         <AlertDialogDescription class="space-y-2">
           <div>
-            <Label>Nome:</Label>
-            <Input v-model:model-value="store.name" type="text" />
-          </div>
-          <div>
             <Label>Deixe um comentário:</Label>
-            <Textarea v-model:model-value="store.review" type="text" />
+            <Textarea v-model="review" type="text" />
           </div>
         </AlertDialogDescription>
       </AlertDialogHeader>
@@ -46,15 +42,16 @@ import { Button } from '@/primary/components/ui/button'
 import { ref } from 'vue'
 import { Textarea } from '@/primary/components/ui/textarea'
 import { Label } from '@/primary/components/ui/label'
-import { Input } from '@/primary/components/ui/input'
-import useReviewStore from '@/primary/infrastructure/store/review'
+
 import TheToast from '@/primary/components/interfaces/TheToast.vue'
 
+const review = defineModel<string>('review', { required: true })
+
 const emit = defineEmits(['addReview'])
-const store = useReviewStore()
+
 const isOpened = ref()
 const addReview = () => {
-  emit('addReview', store.review, store.name)
+  emit('addReview')
   isOpened.value = false
 }
 </script>

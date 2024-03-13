@@ -46,7 +46,7 @@
                   >Home</router-link
                 >
               </li>
-              <router-link :to="RouteNameEnum.ABOUT">
+              <router-link :to="{ name: RouteNameEnum.ABOUT }">
                 <li>
                   <a
                     href="#"
