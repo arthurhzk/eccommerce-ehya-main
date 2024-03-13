@@ -11,8 +11,8 @@
       <div class="flex justify-center">
         <Input class="md:p-6" placeholder="Eu quero comprar..." type="text" />
 
+        <span class="absolute start-0 inset-y-0 flex items-center justify-center px-2"> </span>
         <Button class="md:p-6"><Search /></Button>
-
         <img class="hidden lg:block" src="/Shopping Checkout Medium.png" />
       </div>
       <div class="flex items-center justify-center mt-6">
@@ -87,15 +87,17 @@
   </section>
   <section>
     <SideContainer>
-      <h2 class="text-text-blue text-center my-14 font-bold text-2xl">Categorias</h2>
-      <div class="grid grid-cols-2 md:flex md:flex-row gap-4 justify-center observe">
-        <CategoryCard
-          v-for="category in categories"
-          :key="category.id"
-          :category="category"
-          class="w-full"
-        />
-      </div>
+      <h2 class="text-text-blue text-center my-14 font-bold text-2xl">Nossos produtos:</h2>
+      <router-link :to="{ name: RouteNameEnum.PRODUCTS }">
+        <div class="grid grid-cols-2 md:flex md:flex-row gap-4 justify-center observe">
+          <CategoryCard
+            v-for="category in categories"
+            :key="category.id"
+            :category="category"
+            class="w-full"
+          />
+        </div>
+      </router-link>
     </SideContainer>
   </section>
   <section>
@@ -142,34 +144,7 @@
       </p>
       <div class="flex flex-wrap items-center justify-center gap-6 mt-6"></div>
     </SideContainer>
-  </section>
-
-  <section class="bg-blue-acqua md:bg-white w-screen my-14">
-    <SideContainer class="md:block md:bg-blue-acqua rounded-md">
-      <div class="lg:flex">
-        <img
-          src="/Foreign Exchange Market Medium.png"
-          class="hidden md:hidden lg:block mx-auto md:pt-10 observe"
-        />
-        <div class="pt-12 px-5 space-y-4 text-center">
-          <h2 class="text-white text-2xl">Nunca esqueça uma promoção</h2>
-          <p class="font-light text-main-white">
-            Nós sempre oferecemos aos nossos clientes uma promoção para <br class="lg:visible" />
-            mostrar nosso apreço pela fidelidade deles conosco. Basta se inscrever conosco.
-          </p>
-          <div class="py-4 rounded-lg space-y-4">
-            <Input id="search" type="text" placeholder="Assinar Newsletter" class="pl-10" />
-
-            <Button class="font-bold text-lg">Inscreva-se</Button>
-          </div>
-        </div>
-        <img class="block md:hidden mx-auto observe" src="/Foreign Exchange Market.png" />
-        <img
-          src="/Foreign Exchange Market Medium.png"
-          class="hidden md:block lg:hidden mx-auto observe"
-        />
-      </div>
-    </SideContainer>
+    <NewsletterSection />
   </section>
 </template>
 
@@ -183,6 +158,8 @@ import CategoryCard from '@/primary/components/interfaces/CategoryCard.vue'
 import ServiceCard from '@/primary/components/interfaces/ServiceCard.vue'
 import categories from '@/domain/data/categories'
 import services from '@/domain/data/services'
+import NewsletterSection from '@/primary/components/interfaces/NewsletterSection.vue'
+import { RouteNameEnum } from '@/domain/enums/RouteEnum'
 
 onMounted(() => {
   const observer = new IntersectionObserver((entries) => {

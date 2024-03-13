@@ -45,7 +45,9 @@
       </CardContent>
       <CardFooter>
         <div class="flex flex-col mx-auto">
-          <Button @click="handleLogin" class="w-full"> Acessar </Button>
+          <Button @click="handleLogin" class="w-full">
+            Acessar <Loader class="animate-spin" v-if="isLoading" />
+          </Button>
           <p class="text-red-500 mt-4">{{ store.errorResponse }}</p>
         </div>
       </CardFooter>
@@ -72,10 +74,16 @@ import useUserStore from '@/primary/infrastructure/store/user'
 import { useRouter } from 'vue-router'
 import { RouteNameEnum } from '@/domain/enums/RouteEnum'
 import { useToast } from '@/primary/components/ui/toast/use-toast'
+import useLoader from '@/primary/infrastructure/composables/useLoader'
+import { Loader } from 'lucide-vue-next'
 const store = useUserStore()
 const router = useRouter()
 const { toast } = useToast()
+
+const { isLoading } = useLoader()
+
 const handleLogin = async () => {
+  isLoading.value = true
   try {
     await store.signIn()
     router.push({ name: RouteNameEnum.HOME })
@@ -91,6 +99,8 @@ const handleLogin = async () => {
       description: 'Verifique o email e a senha e tente novamente',
       variant: 'destructive'
     })
+  } finally {
+    isLoading.value = false
   }
 }
 </script>

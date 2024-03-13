@@ -40,6 +40,11 @@ const router = createRouter({
       component: () => import('@/primary/pages/ProfilePage.vue')
     },
     {
+      path: '/about',
+      name: RouteNameEnum.ABOUT,
+      component: () => import('@/primary/pages/AboutPage.vue')
+    },
+    {
       path: '/:pathMatch(.*)*',
       name: RouteNameEnum.NOT_FOUND,
       component: () => import('@/primary/pages/NotFoundPage.vue')

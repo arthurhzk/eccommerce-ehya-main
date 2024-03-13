@@ -6,7 +6,8 @@ function useFetchProducts() {
   const prices = ref<null | any>([])
   const fetchProducts = async () => {
     const response = await stripe.products.list({
-      limit: 100
+      limit: 100,
+      active: true
     })
     products.value = response.data
   }
